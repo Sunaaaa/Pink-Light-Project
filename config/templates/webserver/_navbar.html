@@ -1,0 +1,41 @@
+{% load  static %}
+<nav class="mt-1 mb-5 navbar navbar-expand-lg navbar-light" style="background-color: rgb(251, 225, 225); ">
+  <a class="navbar-brand" href="#">
+    <img style="width:20%; height:20%;" src="{% static 'webserver/image/logo.png' %}" alt="Here_You_Are" >
+  </a>
+  <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'webserver:index' %}">홈으로</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'webserver:new' %}">열차추가</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'webserver:index' %}">로그아웃</a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a> 관리자 전용 페이지 입니다.  </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'accounts:login' %}">Login</a>
+        </li>
+      {% endif %}
+    </ul>
+    <ul class="nav nav-pills">
+      <li class="nav-item dropdown">
+        <a  class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"  style="background-color: rgb(255, 128, 128); ">열차 바로가기</a>
+        <div class="dropdown-menu">
+        {% for train_no in train_no_list %}
+          <a class="dropdown-item" href="{% url 'webserver:train_detail' train_no %}">{{train_no}}번</a>        
+        {% endfor %}
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

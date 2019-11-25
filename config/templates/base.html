@@ -1,0 +1,34 @@
+{% load bootstrap4 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Here You Are</title>
+  <link rel="shortcut icon" href="{% static 'webserver/image/logo.png' %}" type="image/x-icon" >
+  {% bootstrap_css %}
+
+  <!-- Axios CDN -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    {% include 'webserver/_navbar.html' %}
+    <hr>
+    {% block notify %}
+    {% endblock  %}
+    <hr>
+    <div class="container">
+    {% block body %}
+    {% endblock  %}
+    
+    </div>
+
+  {% bootstrap_javascript jquery='full' %}
+</body>
+
+</html>

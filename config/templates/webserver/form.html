@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+
+
+{% block body %}
+
+<form action="" method="post" class="form">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+    <button type="submit" class="btn btn-warning">
+    {% if request.resolver_match.url_name == 'new' %}
+          추가하기
+    {% else %}
+          수정하기  
+    {% endif %}
+    </button>
+  {% endbuttons %}
+</form>
+
+
+{% endblock  %}

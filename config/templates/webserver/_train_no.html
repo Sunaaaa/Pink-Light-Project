@@ -1,0 +1,16 @@
+<div class="col-12 col-sm-6 col-md-4 mb-3">
+  <div class="card">
+    <div class="card-body">
+      <h5 style="display : inline;" class="card-title">
+        {{ train.train_no }} 번 열차 {{train.slot_no}} 번째 칸 {{train.seat_no}} 번 임산부석
+      </h5>
+    </div>
+
+    {% if train.empty  %}
+      <span class="p-3 mb-2 bg-success text-white">이용가능</span>
+    {% else %}
+      <span class="p-3 mb-2 bg-danger text-white">이용중</span>
+    {% endif %}
+  </div>
+  <a href="{% url 'webserver:detail' train.pk %}" class="mt-1 mb-4 btn btn-info">상세보기</a>
+</div> 

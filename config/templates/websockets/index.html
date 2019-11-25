@@ -1,0 +1,36 @@
+<html>
+  <head></head>
+  <body>
+    {% comment %} <button id="server-button"> 서버 켜기 </button>
+    <button id="client-button"> 클라이언트  </button> {% endcomment %}
+
+    <h1>아아아</h1>
+
+    <form action="{% url 'websockets:server' %} " method="post">
+    <label for="text">SERVER</label>
+    {% csrf_token %}
+      <input type="submit" value="서버 켜기">
+    </form> 
+
+    <form action="{% url 'websockets:client' %} " method="post">
+    <label for="text">CLIENT</label>
+    {% csrf_token %}
+      <input type="submit" value="클라이언트 켜기">
+    </form> 
+
+
+    <script>
+      const button = document.getElementById('server-button')
+      button.addEventListener('click', function(){
+        console.log('버튼이 클릭됨')
+      })
+
+      const button = document.getElementById('client-button')
+      button.addEventListener('click', function(){
+        console.log('버튼이 클릭됨')
+      })
+
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+
+{% block notify %}
+  <div class="ml-2">
+    <p>
+      <button class="btn" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="background-color: rgb(255, 128, 128)">
+        알림
+      </button>
+    </p>
+  </div>
+  <div class="collapsing" id="collapseExample">
+    {% if notifications %}
+      <div class="jumbotron jumbotron-fluid bg-warning" >
+        <div class="row m-1">
+          {% if user.is_authenticated %}
+            {% for notification in notifications %}
+              {% include 'webserver/_toast.html' %}
+            {% empty %}
+            <p> 새로운 알림이 없습니다. </p>
+            {% endfor %}    
+          {% endif %}
+
+        </div>
+      </div>
+
+    {% endif %}
+  </div>
+{% endblock notify %}
+
+
+{% block body %}
+
+
+<div class="container">
+  <div class="row mt-4">
+    {% if user.is_authenticated %}
+      {% for train in train_no_list %}
+        {% include 'webserver/_trains.html' %}
+      {% empty %}
+      <p>열차에 대한 정보가 없습니다.</p>
+      {% endfor %}    
+    {% else %}
+      <p>관리자 전용 </p>
+    {% endif %}
+
+  </div>
+<div>
+
+<div class="container">
+  <div class="row mt-4">
+    {% if user.is_authenticated %}
+      {% for train in trains %}
+        {% include 'webserver/_train_no.html' %}
+      {% empty %}
+      <p>열차에 대한 정보가 없습니다.</p>
+      {% endfor %}    
+    {% else %}
+      <p>관리자 전용 </p>
+    {% endif %}
+
+  </div>
+
+<div>
+
+{% endblock  %}

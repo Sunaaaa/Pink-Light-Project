@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block body %}
+  <div class="mt-4 col-7">
+    <div class="card">
+      <div class="card-body">
+        <h5 style="display : inline;" class="card-title">
+          {{ train.train_no }} 번 열차 {{train.slot_no}} 번째 칸 {{train.seat_no}} 번 임산부석
+        </h5>
+      </div>
+      {% if train.empty  %}
+          <span class="p-3 mb-2 bg-danger text-white">이용중</span>
+        {% else %}
+          <span class="p-3 mb-2 bg-success text-white">이용가능</span>
+        {% endif %}
+    </div>
+  </div> 
+  <div class="container">
+    <div class="mt-4 row row justify-content-center">
+      <div class="col-12 col-sm-9  col-md-10 mb-3">
+        <a href="{% url 'webserver:edit' train.pk %}" class="btn btn-warning">열차 정보 수정하기</a>
+        <form action="{% url 'webserver:edit' train.pk %}" method="POST" style="display : inline;" onclick="return confirm('정말로 삭제하시겠습니까')">
+          {% csrf_token %}
+          <input class="btn btn-danger"  type="submit" value="열차삭제">
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock body %}
