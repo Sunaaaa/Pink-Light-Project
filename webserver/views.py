@@ -8,38 +8,37 @@ import requests
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
 from decouple import config
+import json
+
 
 # Create your views here.
-
 # @csrf_exempt
 def pink_light(request, seat_info):
     if request.method == "POST":
         print('POST')
-    else:
-        print('GET')
 
-    train_no = seat_info[:6]
-    slot_no = seat_info[6:9]
-    seat_no = seat_info[9:]
+        train_no = seat_info[:6]
+        slot_no = seat_info[6:9]
+        seat_no = seat_info[9:]
 
-    # 임산부석 상태 변경
-    train = Train.objects.get(train_no=train_no, slot_no=slot_no, seat_no=seat_no)
-    if train.empty :
-        train.empty = False
-    else :
-        train.empty = True
-    train.save()
+        # 임산부석 상태 변경
+        train = Train.objects.get(train_no=train_no, slot_no=slot_no, seat_no=seat_no)
+        if train.empty :
+            train.empty = False
+        else :
+            train.empty = True
+        train.save()
 
-    # 열차 정보 & 알림 가져오기
-    status = ""
-    if train.empty:
-        status = "이용 완료"
-    else : 
-        status = "이용 중"
-    content = f'{ train.train_no } 번 열차 {train.slot_no} 번째 칸 {train.seat_no} 번 임산부석 {status}'
-    print(content)
+        # 열차 정보 & 알림 가져오기
+        status = ""
+        if train.empty:
+            status = "이용 완료"
+        else : 
+            status = "이용 중"
+        content = f'{ train.train_no } 번 열차 {train.slot_no} 번째 칸 {train.seat_no} 번 임산부석 {status}'
+        print(content)
 
-    notify = Notification.objects.create(content=content)
+        notify = Notification.objects.create(content=content)
 
     return redirect('webserver:index')
 
@@ -78,7 +77,6 @@ def station_status(request, station):
         'down' : empty_seat_status_down
     }
 
-
     context = {
         'empty_seat_status' : empty_seat_status,
         'trainLineNm' : trainLineNm,
@@ -86,177 +84,83 @@ def station_status(request, station):
     }
     return JsonResponse(context)
 
+# @csrf_exempt 
+def station_status_detail(request, station):
+    print('뿜뿜뿜')
+    up_train1_no = "001001"
+    up_train2_no = "001003"
+    down_train1_no = "001002"
+    down_train2_no = "001004"
+    t_up_1 = Train.objects.filter(train_no=up_train1_no)
+    t_up_2 = Train.objects.filter(train_no=up_train2_no)
+    t_down_1 = Train.objects.filter(train_no=down_train1_no)
+    t_down_2 = Train.objects.filter(train_no=down_train2_no)
 
-def station_info(request, train_name):
-    print(train_name)
+    empty_up_1 = []
+    for t in t_up_1:
+        empty_up_1.append(t.empty)
+    
+    print('=====')
+
+    empty_up_2 = []
+    for t in t_up_2:
+        empty_up_2.append(t.empty)
+    
+    print('=====')
+
+    empty_down_1 = []
+    for t in t_down_1:
+        empty_down_1.append(t.empty)
+    
+    print('=====')
+
+    empty_down_2 = []
+    for t in t_down_2:
+        empty_down_2.append(t.empty)
+
+    print('=====')
+
+    empty_seat_status = {
+        'up' : {
+            # 'trains' : [up_train1_no, up_train2_no]
+            'total' : [len(t_up_1), len(t_up_2)],
+            'empty' : [sum(empty_up_1), sum(empty_up_2)],
+        },
+        'down' : {
+            # 'trains' : [down_train1_no, down_train2_no]
+            'total' : [len(t_down_1), len(t_down_2)],
+            'empty' : [sum(empty_down_1), sum(empty_down_2)]
+        },
+    }
+
+    api_url = 'http://swopenapi.seoul.go.kr/api/subway'
+    key = config('SUBWAY_REAL_TIME')
+    station_status = requests.get(f'{api_url}/{key}/json/realtimeStationArrival/0/5/{station}').json()
+    data = station_status['realtimeArrivalList']
+    print(len(data))
+
+    btrainNo = []
+    trainLineNm = []
+    arvlMsg2 = []
+    
+    mmy_trains = []
+    for i in range(len(data)):
+        btrainNo.append(data[i].get('btrainNo'))
+        trainLineNm.append(data[i].get('trainLineNm'))
+        arvlMsg2.append(data[i].get('arvlMsg2'))
+        mmy_trains.append([data[i].get('btrainNo'), data[i].get('trainLineNm'), data[i].get('arvlMsg2')])
+
+
+
     context = {
-        '상행' : [
-            {
-                '001002': [{
-                    'slot_no' : '004',
-                    'seat_no' : '01',
-                    'empty' : False
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '02',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '03',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '01',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '02',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '01',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '02',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }
-                ]
-            },
-            {
-                '001003': [{
-                    'slot_no' : '004',
-                    'seat_no' : '01',
-                    'empty' : True
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '02',
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '01',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '01',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '02',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '01',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '02',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '03',                    
-                    'empty' : False
-                }
-                ]
-            }
-        ],
-        '하행' : [
-            {
-                '001004': [{
-                    'slot_no' : '004',
-                    'seat_no' : '01',
-                    'empty' : False
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '02',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '01',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '02',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '03',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '01',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '02',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }
-                ]
-            },
-            {
-                '001005': [{
-                    'slot_no' : '004',
-                    'seat_no' : '01',
-                    'empty' : False
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '02',
-                    'empty' : False
-                }, {
-                    'slot_no' : '004',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '01',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '02',                    
-                    'empty' : False
-                }, {
-                    'slot_no' : '005',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '01',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '02',                    
-                    'empty' : True
-                }, {
-                    'slot_no' : '006',
-                    'seat_no' : '03',                    
-                    'empty' : True
-                
-                }]
-            }
-        ],
-
+        'trains' : mmy_trains,
+        # 'btrainNo' : btrainNo,
+        # 'trainLineNm' : trainLineNm,
+        # 'arvlMsg2' : arvlMsg2,
+        'empty_seat_status' : empty_seat_status,        
     }
     return JsonResponse(context)
+
 
 def index(request):
     trains = Train.objects.all()
@@ -264,6 +168,7 @@ def index(request):
     train_list = list(Train.objects.filter().values('train_no').order_by('train_no').distinct())
     print(type(train_list))
     print(train_list)
+
 
     train_no_list = []
     t_list = []
@@ -285,6 +190,7 @@ def index(request):
         'notifications': notifications,
     }
     return render(request, 'webserver/index.html', context)
+
 
 def new(request):
 

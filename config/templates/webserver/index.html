@@ -64,4 +64,30 @@
 
 <div>
 
+<script>
+
+    // 1. 모든 좋아요 버튼 가져오기
+    const closeButtons = document.querySelectorAll('.close-button')
+
+    // 2. forEach 함수 활용 -> 각각의 버튼 하나하나를 꺼내서 특정 동작을 추가한다.
+    closeButtons.forEach(button => {
+    button.addEventListener('click', function(e){
+        console.log(e)
+
+        // event.target.classList, event.target.dataset.id
+        // 1. data-id에 article.pk가 들어있다. ==> 동적 라우팅 활용
+        const notificationId = e.target.dataset.id
+        console.log(notificationId)
+
+        // 2. 해당 게시글의 '좋아요' 요청 보내기
+        axios.get(`/webserver/${notificationId}/delete/`)
+        // 3. 응답 결과 확인
+            .then( response => {
+            console.log(response)
+        })
+            .catch(error => {console.log(error)})
+    })
+})
+
+</script>
 {% endblock  %}
