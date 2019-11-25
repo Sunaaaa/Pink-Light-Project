@@ -10,21 +10,14 @@ from django.db.models import Count
 from decouple import config
 
 # Create your views here.
-# @csrf_exempt
-def pp(request, seat_info):
-    if request.method == "POST":
-        print('난 포스트')
-    else:
-        print('난 갯')
-
-    context = {
-        'aa' : seat_info,
-    }
-    return JsonResponse(context)
-
 
 # @csrf_exempt
 def pink_light(request, seat_info):
+    if request.method == "POST":
+        print('POST')
+    else:
+        print('GET')
+
     train_no = seat_info[:6]
     slot_no = seat_info[6:9]
     seat_no = seat_info[9:]
@@ -50,55 +43,46 @@ def pink_light(request, seat_info):
 
     return redirect('webserver:index')
 
-    # trains = Train.objects.all()
-
-    # notifications = Notification.objects.all()
-    
-    # context = {
-    #     'pink_light' : train,
-    #     'trains' : trains,
-    #     'notifications': notifications,
-    # }
-    # return render(request,'webserver/index.html', context)
-
-
 # @csrf_exempt 
 def station_status(request, station):
     print('뿜뿜뿜')
 
-    if request.method == "POST":
-        print('난 포스트')
-    else:
-        print('난 갯')
-
-    print(station)
     api_url = 'http://swopenapi.seoul.go.kr/api/subway'
     key = config('SUBWAY_REAL_TIME')
     station_status = requests.get(f'{api_url}/{key}/json/realtimeStationArrival/0/5/{station}').json()
-    print(station_status)
     data = station_status['realtimeArrivalList']
     print(len(data))
-    t_no = data[0].get('btrainNo')
-    t_no = "00" + t_no
-    print(t_no)
 
-
-    btrainNo = []
     trainLineNm = []
-    arvlMsg2 = []
-    empty_seat = []
 
-    for i in range(len(data)):
-        btrainNo.append(data[i].get('btrainNo'))
+    for i in range(0,4,2):
         trainLineNm.append(data[i].get('trainLineNm'))
-        arvlMsg2.append(data[i].get('arvlMsg2'))
-        empty_seat.append(i+1)
+
+    empty_dict = []
+    t_up = Train.objects.filter(train_no="001001")
+    t_down = Train.objects.filter(train_no="001002")
+
+    for t in t_up:
+        empty_dict.append(t.empty)
+
+    empty_seat_status_up = sum(empty_dict)
+
+    empty_dict = []
+    for t in t_down:
+        empty_dict.append(t.empty)
+
+    empty_seat_status_down = sum(empty_dict)
+
+    empty_seat_status = {
+        'up' : empty_seat_status_up,
+        'down' : empty_seat_status_down
+    }
+
 
     context = {
-        'btrainNo' : btrainNo,
+        'empty_seat_status' : empty_seat_status,
         'trainLineNm' : trainLineNm,
-        'arvlMsg2' : arvlMsg2,
-        'empty_seat' : empty_seat,
+
     }
     return JsonResponse(context)
 
