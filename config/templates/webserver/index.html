@@ -34,10 +34,11 @@
 {% block body %}
 
 
-<div class="container">
+{% comment %} <div class="container">
   <div class="row mt-4">
     {% if user.is_authenticated %}
-      {% for train in train_no_list %}
+    
+      {% for train_no, info in train_detail.items %}
         {% include 'webserver/_trains.html' %}
       {% empty %}
       <p>열차에 대한 정보가 없습니다.</p>
@@ -47,7 +48,7 @@
     {% endif %}
 
   </div>
-<div>
+<div> {% endcomment %}
 
 <div class="container">
   <div class="row mt-4">

@@ -2,12 +2,14 @@
   <div class="card">
     <div class="card-body">
       <p style="display : inline;" class="card-title">
-        {{ train }} 번 열차
+        {{ train_no }} 번 열차
       </p>
-      <a data-toggle="collapse" href="#aa" role="button" aria-expanded="false" aria-controls="aa" style="float : right;" class="btn btn-light" href="#" >&or;</a> 
+      <a data-toggle="collapse" href="#{{ train_no }}" role="button" aria-expanded="false" aria-controls="aa" style="float : right;" class="btn btn-light" href="#" >&or;</a> 
     </div>
-    <div class="collapse" id="aa">
+    <div class="collapse" id="{{ train_no }}">
       <div class="card card-body">
+      {{info}}
+      {% comment %} {{train_detail[train]}} {% endcomment %}
         <p>열차</p>
       </div>
     </div>

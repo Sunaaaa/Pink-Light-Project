@@ -88,8 +88,8 @@ def station_status(request, station):
 def station_status_detail(request, station):
     print('뿜뿜뿜')
     up_train1_no = "001001"
-    up_train2_no = "001003"
-    down_train1_no = "001002"
+    up_train2_no = "001002"
+    down_train1_no = "001003"
     down_train2_no = "001004"
     t_up_1 = Train.objects.filter(train_no=up_train1_no)
     t_up_2 = Train.objects.filter(train_no=up_train2_no)
@@ -173,6 +173,7 @@ def station_status_detail(request, station):
     }
 
     context = {
+        'test' : [up_train1_no, up_train2_no ,down_train1_no, down_train2_no],
         'trains_count' : mmy_trains_count,
         'trains' : mmy_trains,
         # 'btrainNo' : btrainNo,
@@ -182,9 +183,24 @@ def station_status_detail(request, station):
     }
     return JsonResponse(context)
 
+def station_train_detail(request, station, train_no):
+    trains = Train.objects.filter(train_no=train_no).order_by('slot_no')[:]
+    print(trains)
+    
+    slot = {}
+    for train in trains:
+        slot[train.slot_no] = slot.get(train.slot_no,[])
+        slot[train.slot_no].append([train.seat_no, train.empty])
+
+
+    context = {
+        'trains' : slot,
+    }
+
+    return JsonResponse(context)
 
 def index(request):
-    trains = Train.objects.all()
+    trains = Train.objects.all()[::-1]
     # tt = Train.objects.values('train_no').annotate(total=Count('train_no'))
     train_list = list(Train.objects.filter().values('train_no').order_by('train_no').distinct())
     print(type(train_list))
@@ -192,20 +208,24 @@ def index(request):
 
 
     train_no_list = []
+    train_detail = {}
     for train in train_list:
         train_no = train.get('train_no')
         train_no_list.append(train_no)
+        train_detail[train_no] = train_detail.get(train_no,[])
 
+    print(train_detail)
 
-    train_detail = {}
     for train_no in train_no_list:
-        train = Train.objects.filter(train_no=train_no)
-        train_detail = [train.slot_no, train.seat_no, train_empty]
+        train_detail[train_no] = Train.objects.filter(train_no=train_no)[:]
+
+    print(train_detail)
 
     notifications = Notification.objects.all()
 
     context = {
         'train_no_list' : train_no_list,
+        'train_detail' : train_detail,
         'trains' : trains,
         'notifications': notifications,
     }
