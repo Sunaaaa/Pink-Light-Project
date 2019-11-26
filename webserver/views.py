@@ -143,16 +143,37 @@ def station_status_detail(request, station):
     trainLineNm = []
     arvlMsg2 = []
     
-    mmy_trains = []
+    my_up_train = []
+    my_down_train = []
+    up, down = (0,0,)
     for i in range(len(data)):
-        btrainNo.append(data[i].get('btrainNo'))
-        trainLineNm.append(data[i].get('trainLineNm'))
-        arvlMsg2.append(data[i].get('arvlMsg2'))
-        mmy_trains.append([data[i].get('btrainNo'), data[i].get('trainLineNm'), data[i].get('arvlMsg2')])
+        str = data[i].get('trainLineNm')
+        print(str)
+        if '강남행' in str:
+            btrainNo.append(data[i].get('btrainNo'))
+            trainLineNm.append(data[i].get('trainLineNm'))
+            arvlMsg2.append(data[i].get('arvlMsg2'))
+            my_up_train.append([data[i].get('btrainNo'), data[i].get('trainLineNm'), data[i].get('arvlMsg2')])
+            up += 1
 
+        if '광교행' in str:
+            btrainNo.append(data[i].get('btrainNo'))
+            trainLineNm.append(data[i].get('trainLineNm'))
+            arvlMsg2.append(data[i].get('arvlMsg2'))
+            my_down_train.append([data[i].get('btrainNo'), data[i].get('trainLineNm'), data[i].get('arvlMsg2')])
+            down += 1
 
+    mmy_trains = {
+        'up' : my_up_train,
+        'down' : my_down_train,
+    }
+    mmy_trains_count = {
+        'up' : up,
+        'down' : down,
+    }
 
     context = {
+        'trains_count' : mmy_trains_count,
         'trains' : mmy_trains,
         # 'btrainNo' : btrainNo,
         # 'trainLineNm' : trainLineNm,
@@ -171,21 +192,20 @@ def index(request):
 
 
     train_no_list = []
-    t_list = []
     for train in train_list:
-        print(train.get('train_no'))
         train_no = train.get('train_no')
         train_no_list.append(train_no)
 
-        my_train = Train.objects.filter(train_no=train_no)
-        t_list.append(list(my_train))
 
+    train_detail = {}
+    for train_no in train_no_list:
+        train = Train.objects.filter(train_no=train_no)
+        train_detail = [train.slot_no, train.seat_no, train_empty]
 
     notifications = Notification.objects.all()
 
     context = {
         'train_no_list' : train_no_list,
-        'tt' : t_list,
         'trains' : trains,
         'notifications': notifications,
     }
